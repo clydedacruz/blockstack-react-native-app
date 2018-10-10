@@ -40,3 +40,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.4'
     distributionUrl = distributionUrl.replace("bin", "all")
 }
+
+ext {
+    buildToolsVersion = "27.0.3"
+    minSdkVersion = 19
+    compileSdkVersion = 27
+    targetSdkVersion = 26
+    supportLibVersion = "27.1.1"
+}
