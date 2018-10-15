@@ -1,122 +1,162 @@
-import React, { Component } from 'react';
-import {NativeModules} from 'react-native';
-import {
-  StyleSheet,
-  Button,
-  Text,
-  View
-} from 'react-native';
+// In App.js in a new project
 
-blockstack = NativeModules.BlockstackNativeModule;
-const textFileName = "message.txt"
+import React from 'react';
+import { View, Text, Button } from 'react-native';
+import Icon  from 'react-native-vector-icons/Ionicons'; 
+import { createSwitchNavigator, createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import { AuthLoadingScreen } from './src/screens/AuthLoading'
 
-export default class App extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            loaded: false, 
-            userData: null,
-            fileContents: null,
-            fileUrl: null
-        };
-      }
-
-    componentDidMount() {
-        this.createSession()
-    }
+class LoginScreen extends React.Component {
+  static navigationOptions = {
+    header: null
+  };
 
   render() {
-    if (this.state.userData) {
-      signInText = "Signed in as " + this.state.userData.decentralizedID
-    } else {
-      signInText = "Not signed in"
-    }
-
-    return (      
-      <View style={styles.container}>
-        <Text tyle={styles.welcome}>Blockstack React Native Example</Text>  
-        
-        <Button title="Sign In with Blockstack" onPress={() => this.signIn()}
-        disabled = {!this.state.loaded || this.state.userData != null}/>
-        <Text>{signInText}</Text>
-
-        <Button title="Sign out" onPress={() => this.signOut()}
-        disabled = {!this.state.loaded || this.state.userData == null}/>
-        
-        <Button title="Put file" onPress={() => this.putFile()}
-        disabled = {!this.state.loaded || this.state.userData == null}/>
-        <Text>{this.state.fileUrl}</Text>
-        
-        <Button title="Get file" onPress={() => this.getFile()}
-        disabled = {!this.state.loaded || this.state.userData == null}/>
-        <Text>{this.state.fileContents}</Text>
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Button
+          title="Login with Blockstack"
+          onPress={() => this.props.navigation.navigate('App')}
+        />
       </View>
     );
   }
+}
 
-  async createSession() {
-    config = {
-      appDomain:"https://flamboyant-darwin-d11c17.netlify.com",
-      scopes:["store_write"]
-    }
-    result = await blockstack.createSession(config)
+class ProfileScreen extends React.Component {
 
-    console.log("created " + result["loaded"])
-    this.setState({loaded:result["loaded"]})
+  static navigationOptions = ({ navigation }) => {
+    return {
+      headerRight: (
+        <Button
+          onPress={navigation.getParam('signOut')}
+          title="Sign out"
+        />
+      ),
+    };
+  };
+  _signOut = () => {
+    this.props.navigation.navigate("Auth")
+  };
+
+  componentDidMount() {
+    this.props.navigation.setParams({ signOut: this._signOut });
   }
 
-  async signIn() {
-    console.log("signIn")
-    console.log("current state: " + JSON.stringify(this.state))
-    result = await blockstack.signIn();
-    
-    console.log("result: " + JSON.stringify(result))
-    this.setState({userData:{decentralizedID:result["decentralizedID"]}})
-  }
 
-  async signOut() {
-    result = await blockstack.signUserOut()
-
-    console.log(JSON.stringify(result))
-    if (result["signedOut"]) {
-      this.setState({userData: null})
-    }
-  }
-
-  async putFile() {
-    this.setState({fileUrl: "uploading..."})
-    content = "Hello React Native"
-    options = {encrypt: false}
-    result = await blockstack.putFile(textFileName, content, options)
-    console.log(JSON.stringify(result))
-    this.setState({fileUrl: result["fileUrl"]})
-  }
-
-  async getFile() {
-    this.setState({fileContents: "downloading..."})
-    options = {decrypt:false}
-    result = await blockstack.getFile(textFileName, options)
-    console.log(JSON.stringify(result))
-    this.setState({fileContents: result["fileContents"]})
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Profile Screen</Text>
+      </View>
+    );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+class AttestationsScreen extends React.Component {
+
+  static navigationOptions = ({ navigation }) => {
+    return {
+      headerRight: (
+        <Button
+          onPress={navigation.getParam('signOut')}
+          title="Sign out"
+        />
+      ),
+    };
+  };
+  _signOut = () => {
+    this.props.navigation.navigate("Auth")
+  };
+
+  componentDidMount() {
+    this.props.navigation.setParams({ signOut: this._signOut });
+  }
+
+
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Attestations Screen</Text>
+      </View>
+    );
+  }
+}
+
+class IdAttestersScreen extends React.Component {
+
+  static navigationOptions = ({ navigation }) => {
+    return {
+      headerRight: (
+        <Button
+          onPress={navigation.getParam('signOut')}
+          title="Sign out"
+        />
+      ),
+    };
+  };
+  _signOut = () => {
+    this.props.navigation.navigate("Auth")
+  };
+
+  componentDidMount() {
+    this.props.navigation.setParams({ signOut: this._signOut });
+  }
+
+
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Id Attesters Screen</Text>
+      </View>
+    );
+  }
+}
+
+const TabNavigator = createBottomTabNavigator({
+  "Profile": { screen: ProfileScreen },
+  "Attestations": { screen: AttestationsScreen },
+  "ID Attesters": { screen: IdAttestersScreen },
+}, {
+  navigationOptions: ({ navigation }) => ({
+    tabBarIcon: ({ focused, horizontal, tintColor }) => {
+      const { routeName } = navigation.state;
+      let iconName;
+      if (routeName === 'Profile') {
+        iconName = 'ios-contact';
+      } else if (routeName === 'Attestations') {
+        iconName = 'ios-list';
+      } else if (routeName === 'Id Attesters') {
+        iconName = 'ios-person-add';
+      }
+      // alert("iconName"+iconName)
+
+      // You can return any component that you like here! We usually use an
+      // icon component from react-native-vector-icons
+      return <Icon name={iconName} size={horizontal ? 20 : 25} color={tintColor} />;
+    },
+  }),
+  tabBarOptions: {
+    activeTintColor: 'tomato',
+    inactiveTintColor: 'gray',
+    showIcon: false 
   },
 });
+
+const AppStack = createStackNavigator(
+  {
+    TabNavigator: TabNavigator,
+  }
+);
+
+const AuthStack = createStackNavigator({ Login: LoginScreen });
+export default createSwitchNavigator(
+  {
+    AuthLoading: AuthLoadingScreen,
+    App: AppStack,
+    Auth: AuthStack,
+  },
+  {
+    initialRouteName: 'AuthLoading',
+  }
+);
